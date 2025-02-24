@@ -43,9 +43,9 @@ resource "azurerm_network_security_rule" "rule_vm_2" {
     source_port_range          = "*"
     destination_port_range     = "443"
     source_address_prefix      = "*"
-    destination_address_prefix = azurerm_network_interface.nic-vm.private_ip_address
+    destination_address_prefix = azurerm_network_interface.nic-vm[each.key].private_ip_address
   resource_group_name         = azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg-vm
+  network_security_group_name = azurerm_network_security_group.nsg-vm[each.key].name
 }
 
 resource "azurerm_network_interface_security_group_association" "nsg-ass-vm" {
