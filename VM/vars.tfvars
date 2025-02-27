@@ -1,13 +1,8 @@
-
-subscription_id = "xxx"
-
-tenant_id = "xxx"
-
 rsg_names = "rsg_01"
 
 location_names = "southeastasia"
 
-snet_name = "subnet_01"
+snet_name = "Your's subnet ID on azure portal"
 
 vm_names = [ "vm01", "vm02" ]
 
