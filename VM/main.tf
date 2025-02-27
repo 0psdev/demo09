@@ -29,22 +29,22 @@ resource "azurerm_network_security_rule" "rule_vm_1" {
   destination_port_range     = "3389"
   source_address_prefix      = "*"
   destination_address_prefix = azurerm_network_interface.nic-vm[each.key].private_ip_address
-  resource_group_name        = azurerm_resource_group.rg.name
+  resource_group_name = var.rsg_names
   network_security_group_name = azurerm_network_security_group.nsg-vm[each.key].name
 }
 
 resource "azurerm_network_security_rule" "rule_vm_2" {
   for_each = toset(var.vm_names)
-    name                       = "allow_https"
-    priority                   = 101
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = azurerm_network_interface.nic-vm[each.key].private_ip_address
-  resource_group_name         = azurerm_resource_group.rg.name
+  name                       = "allow_https"
+  priority                   = 101
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "443"
+  source_address_prefix      = "*"
+  destination_address_prefix = azurerm_network_interface.nic-vm[each.key].private_ip_address
+  resource_group_name = var.rsg_names
   network_security_group_name = azurerm_network_security_group.nsg-vm[each.key].name
 }
 
@@ -57,16 +57,16 @@ resource "azurerm_network_interface_security_group_association" "nsg-ass-vm" {
 resource "azurerm_windows_virtual_machine" "vm" {
   for_each = toset(var.vm_names)
   name                = "${each.key}"
-  resource_group_name = azurerm_resource_group.rg.name
-  location = azurerm_resource_group.rg.location
-  size                = var.vm_specs[each.key.vm_size]
+  resource_group_name = var.rsg_names
+  location = var.location_names
+  size                = var.vm_specs[each.key].vm_size
   admin_username      = "test_admin"
   admin_password      = "P@$$w0rd1234!"
   computer_name = each.key
   enable_automatic_updates = true
   license_type = "None"
   network_interface_ids = [
-    azurerm_network_interface.nic-vm[each.key]
+    azurerm_network_interface.nic-vm[each.key].id
   ]
 
   os_disk {
@@ -86,11 +86,11 @@ resource "azurerm_windows_virtual_machine" "vm" {
 resource "azurerm_managed_disk" "vm-data-01" {
   for_each = toset(var.vm_names)
   name                 = "${each.key}-data-01"
-  location             = azurerm_resource_group.rg.location
-  resource_group_name  = azurerm_resource_group.rg.name
+  location             = var.location_names
+  resource_group_name  = var.rsg_names
   storage_account_type = "Standard_LRS"
   create_option        = "Empty"
-  disk_size_gb         = var.vm_specs[each.key.disk_size_gb]
+  disk_size_gb         = var.vm_specs[each.key].disk_size_gb
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "disk-attach-vm" {
